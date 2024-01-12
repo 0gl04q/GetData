@@ -6,6 +6,7 @@ import db
 
 
 def main(page: Page):
+
     def btn_click(e):
         def check_input_text(text_field):
             if not text_field.value:
@@ -56,6 +57,13 @@ def main(page: Page):
     page.window_width = 650
     page.window_height = 500
 
+    page.appbar = ft.AppBar(
+        leading=ft.Icon(ft.icons.FLOOD),
+        leading_width=40,
+        title=ft.Text("Выгрузка отчетов"),
+        center_title=False,
+        bgcolor=ft.colors.SURFACE_VARIANT,
+    )
     page.banner = ft.Banner(
         bgcolor=ft.colors.GREEN,
         leading=ft.Icon(ft.icons.FITBIT, color=ft.colors.WHITE, size=40),
@@ -67,6 +75,8 @@ def main(page: Page):
         ],
 
     )
+
+    page.theme_mode = "dark"
 
     page.add(
         ft.ResponsiveRow(
