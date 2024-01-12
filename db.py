@@ -1,39 +1,11 @@
+""" Файл работы с базой данных """
+
 import mysql.connector
 
 
-class MySQLManagerConnect:
-    def __init__(self, user, password, host, database):
-        self.user = user
-        self.password = password
-        self.host = host
-        self.database = database
-
-    def __enter__(self):
-        self.cnx = mysql.connector.connect(
-            user=self.user,
-            password=self.password,
-            host=self.host,
-            database=self.database
-        )
-        return self.cnx
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.cnx.close()
-
-
-class CursorManager:
-    def __init__(self, connect):
-        self.connect = connect
-
-    def __enter__(self):
-        self.cursor = self.connect.cursor()
-        return self.cursor
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.cursor.close()
-
-
 class BaseConnect:
+    """Контекстный менеджер подключения к MySQL и создания курсора"""
+
     def __init__(self, user='root', password='DerParol', host='server-new', database='poverka_db'):
         self.user = user
         self.password = password
@@ -41,22 +13,27 @@ class BaseConnect:
         self.database = database
 
     def __enter__(self):
+        # Подключаем базу
         self.cnx = mysql.connector.connect(
             user=self.user,
             password=self.password,
             host=self.host,
             database=self.database
         )
+        # Инициализируем курсор
         self.cursor = self.cnx.cursor()
 
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        # Закрываем менеджер
         self.cursor.close()
         self.cnx.close()
 
 
 def get_data(year, month, typesc, region):
+    """Функция получения информации о поверках"""
+
     with BaseConnect() as connect_obj:
         query = (f'''
             SELECT  
@@ -83,6 +60,7 @@ def get_data(year, month, typesc, region):
 
         connect_obj.cursor.execute(query)
 
+        # Создаем столбцы и строки таблицы
         data = {
             "Дата поверки": [],
             "ФИО": [],
@@ -96,16 +74,21 @@ def get_data(year, month, typesc, region):
             "Свидетельство": []
         }
 
+        # Получаем информацию по запросу
         response = connect_obj.cursor.fetchall()
 
+        # Наполняем словарь
         for row in response:
             for col in range(10):
                 data[list(data.keys())[col]].append(row[col])
 
+        # Возвращаем готовые данные
         return data
 
 
 def get_region():
+    """Функция получения информации о регионах"""
+
     with BaseConnect() as connect_obj:
         query = (f'''
                     SELECT  
@@ -117,4 +100,5 @@ def get_region():
 
         connect_obj.cursor.execute(query)
 
+        # Возвращаем регионы (Region, id)
         return connect_obj.cursor.fetchall()

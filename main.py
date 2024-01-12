@@ -1,3 +1,5 @@
+""" Основной файл программы """
+
 import design
 import flet as ft
 import sys

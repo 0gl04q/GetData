@@ -6,9 +6,11 @@ import db
 
 
 def main(page: Page):
-
     def btn_click(e):
+        ''' Обработка нажатия на кнопку Отчет '''
+
         def check_input_text(text_field):
+            ''' Валидатор полей '''
             if not text_field.value:
                 text_field.error_text = f'Введите {text_field.label.lower()}'
                 page.update()
@@ -17,12 +19,19 @@ def main(page: Page):
                 text_field.error_text = ''
             return True
 
+        # Создаем кортеж полей
         fields = (drop_year, drop_region, drop_month, drop_typesc)
 
+        # Проверяем все поля, если проверка проходит то создаем Excel
         if all(list(map(check_input_text, fields))):
-            region_id = regions[drop_region.value]
-            create_xlsx(drop_year.value, drop_month.value, drop_typesc.value, region_id)
 
+            # Определяем id и имя региона
+            region_id, region_name = regions[drop_region.value], drop_region.value
+
+            # Создаем Excel
+            create_xlsx(drop_year.value, drop_month.value, drop_typesc.value, region=(region_name, region_id))
+
+            # Очищаем поля
             for field in fields:
                 field.value = ''
 
@@ -30,9 +39,11 @@ def main(page: Page):
             page.update()
 
     def close_banner(e):
+        ''' Обработчик закрытия банера '''
         page.banner.open = False
         page.update()
 
+    # Саздаем выпадающие списки
     drop_year = ft.Dropdown(
         label="Год",
         options=[ft.dropdown.Option(str(year)) for year in range(2021, 2015, -1)]
@@ -47,6 +58,7 @@ def main(page: Page):
         options=[ft.dropdown.Option('ХВС'), ft.dropdown.Option('ГВС')]
     )
 
+    # Получаем словарь регионов Region: ID
     regions = dict(db.get_region())
 
     drop_region = ft.Dropdown(
@@ -54,9 +66,10 @@ def main(page: Page):
         options=[ft.dropdown.Option(region) for region in regions]
     )
 
+    # Задаем настройки страницы
     page.window_width = 650
     page.window_height = 500
-
+    page.theme_mode = "dark"
     page.appbar = ft.AppBar(
         leading=ft.Icon(ft.icons.FLOOD),
         leading_width=40,
@@ -75,9 +88,6 @@ def main(page: Page):
         ],
 
     )
-
-    page.theme_mode = "dark"
-
     page.add(
         ft.ResponsiveRow(
             [ft.Column(col=6, controls=[drop_year, drop_month]),
