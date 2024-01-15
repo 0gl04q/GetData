@@ -31,8 +31,10 @@ class BaseConnect:
         self.cnx.close()
 
 
-def get_data(year, month, typesc, region):
+def get_data(year, month, region, typesc):
     """Функция получения информации о поверках"""
+
+    add_type = f'''AND TypeSc = {typesc}''' if typesc else ''
 
     with BaseConnect() as connect_obj:
         query = (f'''
@@ -52,7 +54,7 @@ def get_data(year, month, typesc, region):
             WHERE
                 YEAR(p.DPoverki) IN ({year})
                 AND MONTH(p.DPoverki) IN ({month})
-                AND TypeSc IN ({typesc})
+                {add_type}
                 AND p.id_region IN ({region})
             ORDER BY
                 DPoverki

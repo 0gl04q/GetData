@@ -20,7 +20,7 @@ def main(page: Page):
             return True
 
         # Создаем кортеж полей
-        fields = (drop_year, drop_region, drop_month, drop_typesc)
+        fields = (drop_year, drop_region, drop_month)
 
         # Проверяем все поля, если проверка проходит то создаем Excel
         if all(list(map(check_input_text, fields))):
